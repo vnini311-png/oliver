@@ -626,7 +626,16 @@
     color: var(--teal-700);
     font-weight: 500;
     letter-spacing: 0.8px;
+    white-space: nowrap;
   }
+  .pill.coral  { background: #fde6e2; color: #b53d2a; }
+  .pill.amber  { background: #fbeed1; color: #8a6515; }
+  .pill.rose   { background: #fbe1ea; color: #a13863; }
+  .pill.sky    { background: var(--sky-100); color: #1e5d83; }
+  .pill.mint   { background: #d8f1e3; color: #15704a; }
+  .pill.violet { background: #e8e0f3; color: #604a8a; }
+  .pill.gray   { background: #ecedef; color: #5a6470; }
+  .pill.orange { background: #ffe4cc; color: #b86220; }
   .empty-line {
     color: var(--ink-mute);
     font-family: var(--sans);
@@ -834,6 +843,7 @@
   .cal-ev.mint  { background: #d8f1e3; color: #15704a; }
   .cal-ev.violet { background: #e8e0f3; color: #604a8a; }
   .cal-ev.gray  { background: #ecedef; color: #5a6470; }
+  .cal-ev.orange { background: #ffe4cc; color: #b86220; }
 
   /* ====== 模態框 ====== */
   .modal-bg {
@@ -2242,13 +2252,28 @@ function renderDayEvents() {
       ? '<div class="empty-line">這一天沒有安排活動。</div>'
       : evs.map(e => `
           <div class="event-row" onclick="editEvent('${e.id}')" onmouseenter="showEvTooltip(event, '${e.id}')" onmouseleave="hideEvTooltip()" style="cursor:pointer">
-            <span class="pill">${catLabel[e.cat] || ''}</span>
+            <span class="pill ${catColorClass(e.cat)}">${catLabel[e.cat] || ''}</span>
             <span style="font-family: var(--mono); color: var(--ink-mute); font-size: 12px;">${e.time || '—'}</span>
             <span style="flex:1;">${escapeHTML(e.title)}</span>
           </div>
         `).join('')
     }
   `;
+}
+
+// 分類→顏色 class 共用查表
+function catColorClass(cat) {
+  switch (cat) {
+    case 'medical': return 'coral';
+    case 'milestone': return 'amber';
+    case 'chore': return 'sky';
+    case 'baby': return 'orange';
+    case 'expense': return 'mint';
+    case 'work': return 'violet';
+    case 'family': return 'rose';
+    case 'other': return 'gray';
+    default: return '';
+  }
 }
 
 // ============ 事件預覽 Tooltip ============
@@ -2364,14 +2389,7 @@ function renderCalendar() {
       <span class="cal-num">${d.getDate()}</span>
       <div class="cal-events">
         ${evs.slice(0,3).map(e => {
-          const cls = e.cat==='medical'?'coral':
-                      e.cat==='milestone'?'amber':
-                      e.cat==='chore'?'sky':
-                      e.cat==='baby'?'rose':
-                      e.cat==='expense'?'mint':
-                      e.cat==='work'?'violet':
-                      e.cat==='family'?'amber':
-                      e.cat==='other'?'gray':'';
+          const cls = catColorClass(e.cat);
           return `<div class="cal-ev ${cls}" data-ev-id="${e.id}" onmouseenter="showEvTooltip(event, '${e.id}')" onmouseleave="hideEvTooltip()" onclick="event.stopPropagation(); editEvent('${e.id}')">${escapeHTML(e.title)}</div>`;
         }).join('')}
         ${evs.length > 3 ? `<div class="cal-ev" style="background:transparent;color:var(--ink-mute);">+${evs.length-3} 更多</div>` : ''}
